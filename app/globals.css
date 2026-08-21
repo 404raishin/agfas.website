@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------
+   AGFAS design tokens
+
+   Values live on :root as plain custom properties and are re-declared
+   for dark mode, so a theme switch is a variable swap rather than a
+   second set of utility classes. `@theme inline` makes Tailwind's
+   utilities point at the variables instead of baking in the values.
+
+   Orange is the only warm colour in either theme, so it always reads
+   as "something needs attention".
+   --------------------------------------------------------------- */
+:root {
+  --paper: #ffffff;
+  --mist: #f7f6f4;
+  --ink: #16191d;
+  --steel: #656c7a;
+  --line: #e6e4e0;
+
+  --flame: #ff8a3d;
+  --flame-deep: #e86a1a;
+  --flame-soft: #ffe9d8;
+  --safe: #2f8f5b;
+
+  /* Solid controls invert against the page, so they carry their own pair. */
+  --solid: #16191d;
+  --on-solid: #ffffff;
+  --on-flame: #1a0f06;
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --paper: #0e1013;
+  --mist: #171a1f;
+  --ink: #edebe8;
+  --steel: #9aa1ac;
+  --line: #262a31;
+
+  --flame: #ff8a3d;
+  --flame-deep: #ffa05e; /* lifted so it stays legible as text on dark */
+  --flame-soft: #2a1c12;
+  --safe: #4ade80;
+
+  --solid: #f2f0ed;
+  --on-solid: #0e1013;
+  --on-flame: #1a0f06;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-mist: var(--mist);
+  --color-ink: var(--ink);
+  --color-steel: var(--steel);
+  --color-line: var(--line);
+  --color-flame: var(--flame);
+  --color-flame-deep: var(--flame-deep);
+  --color-flame-soft: var(--flame-soft);
+  --color-safe: var(--safe);
+  --color-solid: var(--solid);
+  --color-on-solid: var(--on-solid);
+  --color-on-flame: var(--on-flame);
+
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  --radius-card: 14px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Display face carries the personality: heavy and tightly tracked. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: var(--flame-soft);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--flame-deep);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  /* Instrument-panel eyebrow: a live status dot plus a mono label. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--steel);
+  }
+
+  .hairline {
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* The signature meter's idle sweep, and the trip into the alarm band. */
+@keyframes agfas-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--safe);
+  animation: agfas-pulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .status-dot {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
