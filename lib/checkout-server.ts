@@ -12,6 +12,14 @@ import type { WooCart } from "./types";
 
 const TOKEN_COOKIE = "agfas_cart_token";
 
+/**
+ * The Store API will not return an order on the key alone — it also wants the
+ * billing email, to stop anyone walking the order IDs. That email is personal
+ * data, so it is kept in an httpOnly cookie rather than put in the URL where
+ * it would leak through history, referrers and server logs.
+ */
+const ORDER_COOKIE = "agfas_last_order";
+
 export type Address = {
   first_name: string;
   last_name: string;
@@ -206,6 +214,19 @@ export async function placeOrder(input: {
       return { ok: false, error: "The order was not created. Nothing has been charged." };
     }
 
+    const store = await cookies();
+    store.set(
+      ORDER_COOKIE,
+      JSON.stringify({ id: orderId, email: input.billing_address.email ?? "" }),
+      {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30,
+      },
+    );
+
     const confirmation = `/order/${orderId}?key=${encodeURIComponent(orderKey)}`;
 
     if (status === "failure" || status === "error") {
@@ -246,17 +267,38 @@ export type OrderSummary = {
   payment_method?: string;
 };
 
-export async function getOrder(id: number, key: string): Promise<OrderSummary | null> {
+/** The billing email recorded when this browser placed an order. */
+export async function lastOrderEmail(orderId: number): Promise<string | null> {
+  const raw = (await cookies()).get(ORDER_COOKIE)?.value;
+  if (!raw) return null;
+  try {
+    const saved = JSON.parse(raw) as { id?: number; email?: string };
+    if (saved.id !== orderId) return null;
+    return saved.email || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getOrder(
+  id: number,
+  key: string,
+  billingEmail?: string | null,
+): Promise<OrderSummary | null> {
   try {
     const token = await readToken();
     const headers = new Headers({ Accept: "application/json" });
     if (token) headers.set("Cart-Token", token);
 
-    const res = await fetch(
-      `${STORE_API}/order/${id}?key=${encodeURIComponent(key)}`,
-      { headers, cache: "no-store" },
-    );
-    if (!res.ok) return null;
+    const url = new URL(`${STORE_API}/order/${id}`);
+    url.searchParams.set("key", key);
+    if (billingEmail) url.searchParams.set("billing_email", billingEmail);
+
+    const res = await fetch(url.toString(), { headers, cache: "no-store" });
+    if (!res.ok) {
+      console.error(`[order] ${res.status} looking up order ${id}`);
+      return null;
+    }
     return (await res.json()) as OrderSummary;
   } catch {
     return null;

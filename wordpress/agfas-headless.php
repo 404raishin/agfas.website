@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AGFAS Headless Bridge
  * Description: Connects the Next.js storefront to WooCommerce — payment methods, quotation requests, and the enquiry inbox.
- * Version:     5.0.0
+ * Version:     6.0.0
  * Author:      AGFAS
  *
  * INSTALL
@@ -12,6 +12,7 @@
  *   - REST: GET  /wp-json/agfas/v1/payment-methods  enabled gateways for checkout
  *   - REST: POST /wp-json/agfas/v1/quote            quotation requests
  *   - "AGFAS Enquiries" admin screen: every quotation and enquiry, kept in WordPress
+ *   - Sends shoppers back to the storefront after paying, not to WordPress
  *
  * Site text lives in a separate plugin, agfas-content.php, so an issue in one
  * never takes down the other. This file works without it; the quotation
@@ -485,6 +486,33 @@ add_action(
 			echo '<style>#minor-publishing-actions,#misc-publishing-actions .misc-pub-post-status,#misc-publishing-actions .misc-pub-visibility{display:none}</style>';
 		}
 	}
+);
+
+/**
+ * Send shoppers back to the storefront after paying.
+ *
+ * Redirect gateways such as toyyibPay hand the customer to their own site and
+ * then return them to WooCommerce's order-received page. That page lives on
+ * WordPress, which customers are never meant to see — and while the site is in
+ * "Coming soon" mode they would land on the placeholder instead of a receipt.
+ *
+ * Pointing the return URL at the storefront's own confirmation keeps the whole
+ * purchase on one domain.
+ */
+add_filter(
+	'woocommerce_get_return_url',
+	static function ( $url, $order ) {
+		if ( ! $order instanceof WC_Order ) {
+			return $url;
+		}
+
+		return add_query_arg(
+			array( 'key' => $order->get_order_key() ),
+			AGFAS_STOREFRONT_ORIGIN . '/order/' . $order->get_id()
+		);
+	},
+	10,
+	2
 );
 
 /* -------------------------------------------------------------------------

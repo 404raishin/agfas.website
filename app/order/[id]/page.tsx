@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getOrder } from "@/lib/checkout-server";
+import { getOrder, lastOrderEmail } from "@/lib/checkout-server";
 import { formatPrice } from "@/lib/format";
 import { decodeEntities } from "@/lib/wp";
 
@@ -24,8 +24,40 @@ export default async function OrderPage({ params, searchParams }: Props) {
   // The order key is what proves this visitor placed the order.
   if (!key) notFound();
 
-  const order = await getOrder(Number(id), key);
-  if (!order) notFound();
+  // WooCommerce wants the billing email alongside the key, so an order cannot
+  // be read by guessing IDs. It is recalled from the cookie set when this
+  // browser placed the order, rather than carried in the URL.
+  const orderId = Number(id);
+  const email = await lastOrderEmail(orderId);
+  const order = await getOrder(orderId, key, email);
+
+  if (!order) {
+    return (
+      <div className="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
+        <p className="eyebrow">Order</p>
+        <h1 className="mt-4 text-4xl sm:text-5xl">We cannot show this order</h1>
+        <p className="mt-5 text-base leading-relaxed text-steel sm:text-lg">
+          The link may have expired, or it was opened in a different browser
+          from the one used to place the order. Your order itself is safe — the
+          confirmation email has the details.
+        </p>
+        <div className="mt-9 flex flex-wrap gap-3">
+          <Link
+            href="/contact"
+            className="inline-flex h-12 items-center rounded-full bg-solid px-7 text-sm font-medium text-on-solid transition-colors hover:bg-flame-deep hover:text-on-flame"
+          >
+            Ask us about this order
+          </Link>
+          <Link
+            href="/products"
+            className="inline-flex h-12 items-center rounded-full border border-line px-7 text-sm font-medium transition-colors hover:bg-mist"
+          >
+            Continue shopping
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const money = order.totals;
 
