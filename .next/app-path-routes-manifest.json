@@ -2,8 +2,8 @@
   "/_not-found/page": "/_not-found",
   "/_global-error/page": "/_global-error",
   "/favicon.ico/route": "/favicon.ico",
-  "/api/cart/route": "/api/cart",
   "/api/checkout/customer/route": "/api/checkout/customer",
+  "/api/cart/route": "/api/cart",
   "/api/checkout/place/route": "/api/checkout/place",
   "/api/checkout/shipping/route": "/api/checkout/shipping",
   "/api/quote/route": "/api/quote",
@@ -12,12 +12,12 @@
   "/about/page": "/about",
   "/blog/[slug]/page": "/blog/[slug]",
   "/cart/page": "/cart",
-  "/blog/page": "/blog",
   "/checkout/page": "/checkout",
+  "/blog/page": "/blog",
   "/contact/page": "/contact",
   "/order/[id]/page": "/order/[id]",
   "/page": "/",
+  "/products/[slug]/page": "/products/[slug]",
   "/quote/page": "/quote",
-  "/products/page": "/products",
-  "/products/[slug]/page": "/products/[slug]"
+  "/products/page": "/products"
 }

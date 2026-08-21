@@ -13,7 +13,6 @@
  */
 
 const { createServer } = require("http");
-const { parse } = require("url");
 const next = require("next");
 
 const port = parseInt(process.env.PORT || "3000", 10);
@@ -35,7 +34,7 @@ app
   .prepare()
   .then(() => {
     createServer((req, res) => {
-      handle(req, res, parse(req.url, true));
+      handle(req, res);
     }).listen(port, () => {
       console.log(`AGFAS storefront ready on port ${port} (dev=${dev})`);
     });

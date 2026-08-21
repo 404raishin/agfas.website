@@ -20,6 +20,14 @@
 .next/cache/
 .next/dev/
 .next/trace
+# Next rewrites its prerendered output whenever an ISR page revalidates. Tracking
+# those files makes the server dirty within a minute of starting, and the next
+# "git pull" aborts rather than overwrite them. They are regenerated on demand
+# when absent, so the deploy does not need them.
+.next/server/app/**/*.html
+.next/server/app/**/*.rsc
+.next/server/app/**/*.body
+.next/server/app/**/*.meta
 # /.next/
 /out/
 
