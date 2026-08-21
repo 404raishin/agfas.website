@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AGFAS Site Content
  * Description: Edit the storefront's text from WordPress. Independent of the commerce bridge, so a problem in one never takes out the other.
- * Version:     1.0.0
+ * Version:     2.0.0
  * Author:      AGFAS
  *
  * INSTALL
@@ -207,19 +207,25 @@ function agfas_render_admin_page() {
 		foreach ( agfas_schema() as $section ) {
 			foreach ( $section['fields'] as $key => $field ) {
 				$raw = isset( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : '';
+
 				switch ( $field[1] ) {
 					case 'textarea':
-						$values[ $key ] = sanitize_textarea_field( $raw );
+						$clean = sanitize_textarea_field( $raw );
 						break;
 					case 'email':
-						$values[ $key ] = sanitize_email( $raw );
+						$clean = sanitize_email( $raw );
 						break;
 					case 'url':
-						$values[ $key ] = esc_url_raw( $raw );
+						$clean = esc_url_raw( $raw );
 						break;
 					default:
-						$values[ $key ] = sanitize_text_field( $raw );
+						$clean = sanitize_text_field( $raw );
 				}
+
+				// Store only what actually differs from the default. Saving every
+				// field verbatim would freeze wording nobody chose, and later
+				// improvements to the default copy could never reach the site.
+				$values[ $key ] = ( $clean === $field[2] ) ? '' : $clean;
 			}
 		}
 		update_option( AGFAS_OPTION, $values );
@@ -231,8 +237,9 @@ function agfas_render_admin_page() {
 	<div class="wrap">
 		<h1>AGFAS Content</h1>
 		<p style="max-width:46em">
-			Edit the text on the storefront. Leave a field blank to use the original
-			wording. Changes appear on the site within about a minute.
+			Edit the text on the storefront. Leave a field blank to use the wording
+			shown when you first opened this page. Changes appear on the site within
+			about a minute.
 		</p>
 
 		<?php if ( $saved_notice ) : ?>
