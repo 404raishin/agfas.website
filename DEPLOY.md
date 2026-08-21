@@ -3,6 +3,9 @@
 The storefront is a **Node.js application**, not PHP. It needs cPanel's
 *Setup Node.js App* (Phusion Passenger), which runs `server.js`.
 
+> `server.js` is already written and committed. You do not create it — you just
+> name it as the startup file in step 3.
+
 WordPress stays exactly where it is on `wp.agfasgas.com`. Only the storefront
 is deployed here.
 
@@ -128,7 +131,14 @@ server.
 
 1. Set `AGFAS_STOREFRONT_ORIGIN` in `wordpress/agfas-headless.php` to
    `https://agfasgas.com`, and re-upload it to `wp-content/mu-plugins/`.
-2. Add `agfasgas.com` to your reCAPTCHA key.
-3. Leave WooCommerce in **Coming soon** mode. It blocks the WordPress front
+   **Without this, customers who pay are returned to WordPress instead of your
+   own confirmation page.**
+2. Add `agfasgas.com` to your reCAPTCHA key at
+   <https://www.google.com/recaptcha/admin>, keeping `localhost` listed.
+   Without it every form shows "Invalid domain for site key".
+3. Set toyyibPay's **Category Code** in WooCommerce, or no order can complete.
+4. Leave WooCommerce in **Coming soon** mode. It blocks the WordPress front
    end while leaving the REST API working, which is exactly what this
    architecture wants — customers never reach WordPress.
+5. Submit `https://agfasgas.com/sitemap.xml` in Google Search Console.
+6. Place one real low-value order end to end before announcing the site.
