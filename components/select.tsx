@@ -49,6 +49,7 @@ export function Select({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const listId = useId();
+  const buttonId = `${listId}-button`;
 
   const selectedIndex = Math.max(
     0,
@@ -147,8 +148,15 @@ export function Select({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? listId : undefined}
-        aria-labelledby={labelledBy}
-        aria-label={ariaLabel}
+        id={buttonId}
+        /*
+         * The accessible name has to contain the visible text, or a voice-control
+         * user saying "Gas type" cannot activate a button that reads "LPG
+         * (cylinder)". Pointing at both the label and the button's own text
+         * gives "Gas type LPG (cylinder)".
+         */
+        aria-labelledby={labelledBy ? `${labelledBy} ${buttonId}` : undefined}
+        aria-label={ariaLabel ? `${ariaLabel}: ${selected?.label ?? ""}` : undefined}
         onClick={() => (open ? setOpen(false) : openList())}
         onKeyDown={(e) => {
           if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {

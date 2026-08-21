@@ -95,6 +95,10 @@ export default async function ProductsPage({
         </p>
       )}
 
+      {/* Product cards are h3, so the grid needs an h2 above them or the
+          heading order skips a level. It carries no visual weight. */}
+      <h2 className="sr-only">Products</h2>
+
       {products.length > 0 ? (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
