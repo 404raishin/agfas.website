@@ -1,19 +1,46 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-const { createServer } = require("http");
-const next = require("next");
-const { parse } = require("url");
+/**
+ * Entry point for cPanel's "Setup Node.js App" (Phusion Passenger).
+ *
+ * Passenger needs a startup file it can require; it does not run `next start`.
+ * This boots the same Next.js server programmatically. Passenger supplies the
+ * port through PORT and takes over the listening socket itself.
+ *
+ * Not compiled by Next.js, so it must be plain CommonJS the host's Node
+ * understands directly. Cannot be combined with `output: "standalone"`.
+ *
+ * Run `npm run build` before starting, then restart the app in cPanel.
+ */
 
-const port = process.env.PORT || 3000;
-const dev = process.env.NODE_ENV !== "production";
-const app = next({ dev });
+const { createServer } = require("http");
+const { parse } = require("url");
+const next = require("next");
+
+const port = parseInt(process.env.PORT || "3000", 10);
+
+/*
+ * Fail safe to production. Testing `NODE_ENV !== "production"` would start a
+ * development server whenever the variable is unset or misspelled — on a host
+ * with no dev dependencies installed and no dev build, that fails outright.
+ * Development has to be asked for explicitly.
+ */
+const dev = process.env.NODE_ENV === "development";
+
+// Resolved from this file rather than the working directory, which Passenger
+// does not guarantee.
+const app = next({ dev, dir: __dirname });
 const handle = app.getRequestHandler();
 
-app.prepare().then(() => {
-  createServer((req, res) => {
-    const parsedUrl = parse(req.url, true);
-    handle(req, res, parsedUrl);
-  }).listen(port, (err) => {
-    if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}`);
+app
+  .prepare()
+  .then(() => {
+    createServer((req, res) => {
+      handle(req, res, parse(req.url, true));
+    }).listen(port, () => {
+      console.log(`AGFAS storefront ready on port ${port} (dev=${dev})`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to start the Next.js server:", err);
+    process.exit(1);
   });
-});
