@@ -33,9 +33,45 @@ export const CONTENT_DEFAULTS = {
   spec4_label: "Sensor life",
 
   nav_products: "Products",
-  nav_about: "Why AGFAS",
+  nav_about: "About",
   nav_blog: "Safety notes",
   nav_contact: "Contact",
+
+  about_eyebrow: "About AGFAS",
+  about_title: "Gas detection is the whole business.",
+  about_intro:
+    "AGFAS has been established in Malaysia and Singapore since 2018, specialising in gas detector systems. Over the years we have developed a wide range of gas leak detector products built for reliability.",
+
+  about_stat1_value: "2018",
+  about_stat1_label: "Established",
+  about_stat2_value: "MY · SG",
+  about_stat2_label: "Malaysia and Singapore",
+  about_stat3_value: "20",
+  about_stat3_unit: "%LEL",
+  about_stat3_label: "Where every unit alarms",
+
+  about_story_title: "What we build",
+  about_story_body:
+    "Our range covers the two supplies Malaysian and Singaporean buildings actually run on: LPG from cylinders, and piped natural gas. That split matters more than it sounds — the two gases collect at opposite ends of a room, so a detector specified for one will not protect against the other.",
+  about_story_body2:
+    "From a single plug-in unit for a home kitchen through to multi-zone panels for commercial sites, everything we sell is chosen or built around one requirement: it has to alarm early enough that someone still has time to act.",
+
+  about_values_title: "Three things we will not compromise on",
+  about_p1_title: "Specified for the gas you use",
+  about_p1_body:
+    "An LPG sensor and a natural gas sensor are not interchangeable, and mounting height differs because the gases behave differently. We match the unit to your supply before we quote.",
+  about_p2_title: "Alarms loud enough to wake a household",
+  about_p2_body:
+    "A detector that chirps politely is decoration. Our units sound at 85 dB at one metre — the level that carries through a closed kitchen door at night.",
+  about_p3_title: "Stocked and supported locally",
+  about_p3_body:
+    "Units ship from within the region, so replacement sensors and warranty claims do not wait on an overseas parcel.",
+
+  about_cta_title: "Talk to us about your site",
+  about_cta_body:
+    "Restaurants, factories, hostels and homes all need different coverage. Send us the details and we will specify it properly.",
+  about_cta_label: "Get in touch",
+  about_cta_href: "/contact",
 
   shop_title: "Detectors and safety equipment",
   shop_lead:

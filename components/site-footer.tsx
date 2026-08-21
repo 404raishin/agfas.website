@@ -24,7 +24,7 @@ const COLUMNS = [
   {
     heading: "Company",
     links: [
-      { href: "/about", label: "Why AGFAS" },
+      { href: "/about", label: "About" },
       { href: "/blog", label: "Safety notes" },
       { href: "/contact", label: "Contact" },
     ],
