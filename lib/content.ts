@@ -8,6 +8,11 @@ import { WP_URL } from "./wp";
  * plugin degrades to the original wording rather than to blank sections.
  */
 export const CONTENT_DEFAULTS = {
+  /** "no" switches checkout off site-wide; anything else leaves it on. */
+  checkout_enabled: "yes",
+  checkout_message:
+    "Our payment system is currently unavailable. Please request a quotation instead and we will invoice you directly.",
+
   hero_eyebrow: "Gas detection · Malaysia",
   hero_line1: "You cannot smell",
   hero_line2: "a leak in time.",
@@ -115,6 +120,14 @@ export const CONTENT_DEFAULTS = {
 };
 
 export type SiteContent = typeof CONTENT_DEFAULTS;
+
+/**
+ * Checkout is on unless explicitly switched off, so a WordPress outage or a
+ * missing field can never take the shop down by accident — it fails open.
+ */
+export function checkoutEnabled(content: SiteContent): boolean {
+  return content.checkout_enabled !== "no";
+}
 
 /** Edits should show up quickly, so this is cached far more briefly than the catalogue. */
 const CONTENT_REVALIDATE = 60;

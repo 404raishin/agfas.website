@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AGFAS Site Content
  * Description: Edit the storefront's text from WordPress. Independent of the commerce bridge, so a problem in one never takes out the other.
- * Version:     2.0.0
+ * Version:     3.0.0
  * Author:      AGFAS
  *
  * INSTALL
@@ -28,6 +28,13 @@ const AGFAS_OPTION = 'agfas_site_content';
  */
 function agfas_schema() {
 	return array(
+		'checkout'  => array(
+			'label'  => 'Checkout availability',
+			'fields' => array(
+				'checkout_enabled'  => array( 'Accept orders and payments', 'checkbox', 'yes' ),
+				'checkout_message'  => array( 'Message shown when switched off', 'textarea', 'Our payment system is currently unavailable. Please request a quotation instead and we will invoice you directly.' ),
+			),
+		),
 		'hero'      => array(
 			'label'  => 'Home — hero',
 			'fields' => array(
@@ -209,6 +216,10 @@ function agfas_render_admin_page() {
 				$raw = isset( $_POST[ $key ] ) ? wp_unslash( $_POST[ $key ] ) : '';
 
 				switch ( $field[1] ) {
+					case 'checkbox':
+						// An unticked box posts nothing at all, so presence is the value.
+						$clean = isset( $_POST[ $key ] ) ? 'yes' : 'no';
+						break;
 					case 'textarea':
 						$clean = sanitize_textarea_field( $raw );
 						break;
@@ -259,7 +270,19 @@ function agfas_render_admin_page() {
 								<label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $field[0] ); ?></label>
 							</th>
 							<td>
-								<?php if ( 'textarea' === $field[1] ) : ?>
+								<?php if ( 'checkbox' === $field[1] ) : ?>
+								<label>
+									<input id="<?php echo esc_attr( $key ); ?>"
+										name="<?php echo esc_attr( $key ); ?>"
+										type="checkbox" value="yes"
+										<?php checked( 'no' !== $content[ $key ] ); ?> />
+									Yes — customers can place orders
+								</label>
+								<p class="description">
+									Untick to switch off checkout. The cart still works, and shoppers
+									are pointed at the quotation form instead.
+								</p>
+							<?php elseif ( 'textarea' === $field[1] ) : ?>
 									<textarea id="<?php echo esc_attr( $key ); ?>"
 										name="<?php echo esc_attr( $key ); ?>"
 										rows="3" class="large-text"><?php echo esc_textarea( $content[ $key ] ); ?></textarea>

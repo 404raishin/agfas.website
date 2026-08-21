@@ -7,7 +7,15 @@ import { formatPrice } from "@/lib/format";
 import { decodeEntities } from "@/lib/wp";
 import { QuantityInput } from "./quantity-input";
 
-export function CartView({ notice }: { notice?: "bridge-missing" | null }) {
+export function CartView({
+  notice,
+  checkoutOpen = true,
+  checkoutClosedMessage,
+}: {
+  notice?: "bridge-missing" | null;
+  checkoutOpen?: boolean;
+  checkoutClosedMessage?: string;
+}) {
   const { cart, busy, error, update, remove } = useCart();
 
   const noticeBanner =
@@ -164,23 +172,49 @@ export function CartView({ notice }: { notice?: "bridge-missing" | null }) {
             </span>
           </div>
 
-          <Link
-            href="/checkout"
-            className="mt-6 flex h-12 items-center justify-center rounded-full bg-flame px-6 text-sm font-medium text-on-flame transition-colors hover:bg-flame-deep"
-          >
-            Continue to checkout
-          </Link>
+          {checkoutOpen ? (
+            <>
+              <Link
+                href="/checkout"
+                className="mt-6 flex h-12 items-center justify-center rounded-full bg-flame px-6 text-sm font-medium text-on-flame transition-colors hover:bg-flame-deep"
+              >
+                Continue to checkout
+              </Link>
 
-          <Link
-            href="/quote"
-            className="mt-3 flex h-12 items-center justify-center rounded-full border border-line bg-paper px-6 text-sm font-medium transition-colors hover:border-flame hover:bg-flame-soft"
-          >
-            Request a quotation instead
-          </Link>
+              <Link
+                href="/quote"
+                className="mt-3 flex h-12 items-center justify-center rounded-full border border-line bg-paper px-6 text-sm font-medium transition-colors hover:border-flame hover:bg-flame-soft"
+              >
+                Request a quotation instead
+              </Link>
 
-          <p className="mt-4 text-center text-xs leading-relaxed text-steel">
-            Secure checkout. You stay on agfasgas.com throughout.
-          </p>
+              <p className="mt-4 text-center text-xs leading-relaxed text-steel">
+                Secure checkout. You stay on agfasgas.com throughout.
+              </p>
+            </>
+          ) : (
+            <>
+              {/* Ordering is switched off, so the quotation route becomes the
+                  primary action rather than an afterthought. */}
+              <p
+                role="status"
+                className="mt-6 rounded-[var(--radius-card)] border border-flame bg-flame-soft px-4 py-3 text-sm leading-relaxed"
+              >
+                {checkoutClosedMessage}
+              </p>
+
+              <Link
+                href="/quote"
+                className="mt-4 flex h-12 items-center justify-center rounded-full bg-flame px-6 text-sm font-medium text-on-flame transition-colors hover:bg-flame-deep"
+              >
+                Request a quotation
+              </Link>
+
+              <p className="mt-4 text-center text-xs leading-relaxed text-steel">
+                Your cart is kept, and is attached to the quotation.
+              </p>
+            </>
+          )}
           </div>
         </aside>
       </div>

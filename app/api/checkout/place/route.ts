@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { placeOrder, type Address } from "@/lib/checkout-server";
 import { clientIpFrom, verifyRecaptcha } from "@/lib/recaptcha";
+import { checkoutEnabled, getSiteContent } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,13 @@ export async function POST(request: Request) {
     payload = await request.json();
   } catch {
     return NextResponse.json({ ok: false, error: "Malformed request." }, { status: 400 });
+  }
+
+  // Enforced here, not only in the UI — otherwise the switch is decorative and
+  // an order could still be posted straight at this endpoint.
+  const content = await getSiteContent();
+  if (!checkoutEnabled(content)) {
+    return NextResponse.json({ ok: false, error: content.checkout_message }, { status: 503 });
   }
 
   const check = await verifyRecaptcha(payload.recaptchaToken, clientIpFrom(request));
