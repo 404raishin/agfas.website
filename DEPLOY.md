@@ -110,10 +110,26 @@ Check the application's log in *Setup Node.js App*. The usual causes are a
 Node version below 20.9, or `npm run build` never having been run — there is
 no `.next` folder to serve.
 
-**The build fails or is killed partway**
-Shared hosting caps memory per process. If `next build` is killed, build on
-your own machine instead and upload the `.next` folder by File Manager, or ask
-your host to raise the limit. Everything else in the flow stays the same.
+**The build fails with "Out of memory" or "Cannot allocate Wasm memory"**
+Turbopack, which Next.js 16 uses by default, reserves more address space than
+shared hosting allows — typically a 4 GB cap on "Max address space" and "Max
+resident set". `npm run build` therefore uses the **Webpack** builder instead
+(`next build --webpack`), which produces the same output within the limit.
+`npm run build:turbo` is kept for local use, where Turbopack is faster.
+
+If it still runs out of memory, add this environment variable in *Setup Node.js
+App* and build again:
+
+| Variable | Value |
+| --- | --- |
+| `NODE_OPTIONS` | `--max-old-space-size=2048` |
+
+That stops V8 from over-committing inside a capped address space.
+
+**Last resort: build on your own machine.** Run `npm run build` locally, zip the
+`.next` folder, upload it into the application root through File Manager, and
+extract it. Restart the app. You would repeat this on every code change, so
+prefer the two options above.
 
 **Forms say "Invalid domain for site key"**
 Add `agfasgas.com` to the domain list for your key at
