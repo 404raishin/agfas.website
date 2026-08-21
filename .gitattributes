@@ -1,0 +1,4 @@
+# Build output is compiled artefact, not source. Never rewrite its line endings
+# — that would alter files whose names encode a content hash, and pollute every
+# diff with whole-file changes.
+.next/** -text -diff linguist-generated

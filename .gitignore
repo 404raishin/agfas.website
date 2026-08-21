@@ -14,7 +14,13 @@
 /coverage
 
 # next.js
-/.next/
+# The build output is committed: this host cannot run "next build" (its 4 GB
+# address-space cap rejects the WebAssembly the compiler needs), so the built
+# site is deployed rather than built on the server.
+.next/cache/
+.next/dev/
+.next/trace
+# /.next/
 /out/
 
 # production
@@ -40,3 +46,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 !.env.example
+!.env.production
