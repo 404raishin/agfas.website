@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Passenger requires this uncompiled, so it is CommonJS on purpose.
+    "server.js",
   ]),
 ]);
 

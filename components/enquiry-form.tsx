@@ -4,10 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "./cart-provider";
 import { Recaptcha, RECAPTCHA_SITE_KEY } from "./recaptcha";
+import { Select } from "./select";
 import { decodeEntities } from "@/lib/wp";
 import { QuantityInput } from "./quantity-input";
 
 type Status = "idle" | "sending" | "sent" | "error";
+
+const GAS_TYPES = [
+  { value: "LPG (cylinder)", label: "LPG (cylinder)" },
+  { value: "Natural gas (piped)", label: "Natural gas (piped)" },
+  { value: "Both", label: "Both" },
+  { value: "Not sure", label: "Not sure" },
+] as const;
 
 /**
  * Shared by the quotation and contact pages. Both relay through
@@ -53,6 +61,7 @@ export function EnquiryForm({
   const [error, setError] = useState<string | null>(null);
   const [captcha, setCaptcha] = useState<string | null>(null);
   const [captchaReset, setCaptchaReset] = useState(0);
+  const [gas, setGas] = useState<string>(GAS_TYPES[0].value);
   const copy = COPY[kind];
 
   const lines = copy.attachCart ? (cart?.items ?? []) : [];
@@ -166,19 +175,16 @@ export function EnquiryForm({
       </div>
 
       <div>
-        <label htmlFor="gas" className="mb-2 block text-sm font-medium">
+        <span id="gas-label" className="mb-2 block text-sm font-medium">
           Gas type
-        </label>
-        <select
-          id="gas"
+        </span>
+        <Select
           name="gas"
-          className="h-12 w-full rounded-lg border border-line bg-paper px-4 text-sm"
-        >
-          <option>LPG (cylinder)</option>
-          <option>Natural gas (piped)</option>
-          <option>Both</option>
-          <option>Not sure</option>
-        </select>
+          labelledBy="gas-label"
+          value={gas}
+          onChange={setGas}
+          options={GAS_TYPES}
+        />
       </div>
 
       <div>

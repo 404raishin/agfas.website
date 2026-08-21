@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "./cart-provider";
 import { QuantityInput } from "./quantity-input";
 import { Recaptcha, RECAPTCHA_SITE_KEY } from "./recaptcha";
+import { Select } from "./select";
 import { formatPrice } from "@/lib/format";
 import { decodeEntities } from "@/lib/wp";
 import type { WooCart } from "@/lib/types";
@@ -30,6 +31,8 @@ const MY_STATES: Array<[string, string]> = [
   ["SGR", "Selangor"],
   ["TRG", "Terengganu"],
 ];
+
+const STATE_OPTIONS = MY_STATES.map(([value, label]) => ({ value, label }));
 
 type Form = {
   first_name: string;
@@ -234,22 +237,15 @@ export function CheckoutForm({ paymentMethods }: { paymentMethods: PaymentMethod
             <div className="grid gap-5 sm:grid-cols-3">
               <Field label="City" required value={form.city} onChange={set("city")} name="city" />
               <div>
-                <label htmlFor="state" className="mb-2 block text-sm font-medium">
+                <span id="state-label" className="mb-2 block text-sm font-medium">
                   State <span className="text-flame">*</span>
-                </label>
-                <select
-                  id="state"
-                  name="state"
+                </span>
+                <Select
+                  labelledBy="state-label"
                   value={form.state}
-                  onChange={set("state")}
-                  className="h-12 w-full rounded-lg border border-line bg-paper px-4 text-sm"
-                >
-                  {MY_STATES.map(([code, name]) => (
-                    <option key={code} value={code}>
-                      {name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(state) => setForm((f) => ({ ...f, state }))}
+                  options={STATE_OPTIONS}
+                />
               </div>
               <Field label="Postcode" required value={form.postcode} onChange={set("postcode")} name="postcode" inputMode="numeric" />
             </div>
